@@ -1,11 +1,14 @@
 Package: POPDis
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Simulating population allele frequencies due to dispersal among populations
 Version: 0.1.0
 Author: Jacek Maselko
 Maintainer: The package maintainer <Jacek.Maselko@noaa.gov>
-Description: More about what it does (maybe more than one line)
+Description: The functions contained within this package are used to simulate the changes in allele frequencies among populations. The primary model follows a stochastic process modeled after the Wright-Fisher model where the dispersal of offspring-like propagules is specified with a dispersal matrix.
+    Additional features include age structuring, cohort specific selection, as well as beta log likelihood framework for model selection when assessing candidate dispersal models based on an observed matrix of pairwise population Fst values.
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Imports: smatr, stats
+License: GPL-2
 Encoding: UTF-8
-LazyData: true
+LazyData: false
+RoxygenNote: 7.2.1
