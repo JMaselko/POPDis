@@ -1,25 +1,35 @@
-# Function to test for number of generations to stationarity by calculating correlation, mean and variance for allele frequencies between YInterval generations:
-# Input parameters are:
-# Dispersal="new": Use "Random" or "Panmix" to generate corresponding dispersal matrices
-# Dispersion=NA: Specify the dispersal matrix
-# N=1e3: Effective population size
-# PopLoc=10: Number of populations
-# MinAge=5: Minimum age for spawning cohort
-# MaxAge=20: Maximum lifespan
-# loci=1000: Number of loci to simulate
-# Mutation=TRUE: Wheteher to incorporate mutation
-# Selection=FALSE: Whether to incorporate selection
-# selstr=0: Selection strength
-# Stoch=TRUE: Whether to include stochasticity
-# mut=1e-6: Mutation rate
-# YStart=1: Start year for recording stationarity variables
-# YInterval=10: Interval years between recording stationarity variables
-# YFinal=1e3: Stop simulation after these many generations
+#' @title Time to Stationarity
+#'
+#' @description Function to test for number of generations to stationarity by calculating correlation, mean and variance for allele frequencies between YInterval generations:
+#'
+#' @param Dispersal Use the specified Dispersion matrix, or alternatively if "Random" calls Dispers.Rand function to create random dispersal matrix at each year step.
+#' @param Dispersion Matrix of dispersion probabilities.
+#' @param N Effective population size.
+#' @param PopLoc Number of populations to model
+#' @param MinAge Minimum age of breeding cohort
+#' @param MaxAge Maximum age of oldest cohort, i.e. maximum lifespan
+#' @param loci Number of loci to simulate
+#' @param Mutation Whether to include a mutation parameter in the simulation
+#' @param Selection Whether to include a selection parameter in the simulation
+#' @param selstr Selection strength parameter [-1,1]
+#' @param Stoch Whether to model the dispersion stochastically where each generation parents are chosen at random
+#' @param mut mutation rate
+#' @param YStart Start year for recording stationarity variables
+#' @param YInterval Interval years between recording stationarity variables
+#' @param YFinal Stop simulation after these many year steps
 
-Disp.Stationarity.sim<-function(Dispersal="new",Dispersion=NA, N=1e3,PopLoc=10,MinAge=5, MaxAge=20,loci=1000, Mutation=TRUE,Selection=FALSE, selstr=1,Stoch=TRUE, mut=1e-6,YStart=1,YInterval=10,YFinal=1e3){
+#' @return A data frame of statistics between time intervals
+#' @returns yr1, yr2: year intervals
+#' @returns corr: correlation between the population Fst matrix in yr1 and yr2
+#' @returns meanFst: mean population Fst in yr2
+#' @returns varFst: variance of population Fst in yr2
+#' @examples
+#' Disp.Stationarity.sim(Dispersal="Random", Dispersion=NA, N=1e3, PopLoc=10, MinAge=5, MaxAge=20,loci=1000, Mutation=TRUE, Selection=FALSE, selstr=1, Stoch=TRUE, mut=1e-6, YStart=1, YInterval=10, YFinal=1e3)
+#' @export
+
+Disp.Stationarity.sim<-function(Dispersal="new",Dispersion=NA, N=1e3,PopLoc=10,MinAge=5, MaxAge=20,loci=1000, Mutation=TRUE, Selection=FALSE, selstr=1,Stoch=TRUE, mut=1e-6, YStart=1, YInterval=10, YFinal=1e3){
   #   set.seed(1)
-  if (Dispersal=="Random"){ Dispersion=Dispers.Rand(Pops=PopLoc)} #else
-  if (Dispersal=="Panmix"){ Dispersion=Dispers.Panmix(Pops=PopLoc)}
+  if (Dispersal=="Random"){ Dispersion=Dispers.Rand(Pops=PopLoc)}
   Disp.Stat<-data.frame(yr1=NA,yr2=NA,corr=NA,meanFst=NA, varFst=NA)
   if (any(is.na(Dispersion))==FALSE) {PopLoc<-length(Dispersion[,1])}
   Pop=array(1,c(PopLoc,MaxAge,loci),dimnames=list(Population=c(1:PopLoc),Age=c(1:MaxAge),Loci=c(1:loci)))
@@ -43,7 +53,6 @@ Disp.Stationarity.sim<-function(Dispersal="new",Dispersion=NA, N=1e3,PopLoc=10,M
     x<-matrix(data=NA, nrow=PopLoc, ncol=loci)
     if (Selection==TRUE) {
       s<-runif(loci,-selstr,selstr)}
-    Nc<-N
     for (k in 1:PopLoc){
       # Create spawning aggregates from each spawning cohort
       a_r<-0
@@ -54,11 +63,11 @@ Disp.Stationarity.sim<-function(Dispersal="new",Dispersion=NA, N=1e3,PopLoc=10,M
           lR=lR-1 # Note this is a failure in cohort recruitment to spawning population
         } else {
           if (Stoch==TRUE){
-            a_r <- a_r+rbinom(loci,2*Nc,prob=Pop[k,r,])  # stochastic number of alleles from each cohort
-          } else { a_r <- a_r+round(2*Nc*Pop[k,r,]) }  # deterministic number of alleles from each cohort
+            a_r <- a_r+rbinom(loci,2*N,prob=Pop[k,r,])  # stochastic number of alleles from each cohort
+          } else { a_r <- a_r+round(2*N*Pop[k,r,]) }  # deterministic number of alleles from each cohort
         }
       }
-      a_r<-a_r/(2*Nc*lR) # These are the allele frequencies in cohort aggregated spawner group
+      a_r<-a_r/(2*N*lR) # These are the allele frequencies in cohort aggregated spawner group
       # Now the Spawners of each population create babies:
       if (Mutation == TRUE) {
         a_r<- a_r*(1-mut)+(1-a_r)*mut # with mutation (p(major allele not mutating)+p(minor allele mutating))
@@ -113,5 +122,7 @@ Disp.Stationarity.sim<-function(Dispersal="new",Dispersion=NA, N=1e3,PopLoc=10,M
       i=i+1
     }
   }
+  Disp.Stat<-Disp.Stat[-1,]
+  row.names(Disp.Stat)=NULL
   return(Disp.Stat)
 }

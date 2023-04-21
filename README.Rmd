@@ -1,3 +1,8 @@
+---
+title: "POPDis"
+output: github_document
+---
+
 # Introduction to *POPDis*
 Numerous marine fish species have a characteristic pelagic larval dispersal stage. Understanding how this life history strategy affects the observed population structure of the adult groups and the adaptive potential of the species as a whole is therefore of paramount importance.
 Inferring population structure is one of the primary goals of population genetics. Population structure indicates any deviation from the expectation of random mating resulting in population heterogeneity. It is now commonplace that a first step after sequencing genotypes is to examine the principal component (PCA) plots of sample genotypes for any patterns that may result from non-random mating. PCA partitions the total variation of the genomic sequence samples in orthogonal space and by plotting the first two components is able to visually show underlying patterns in the data in this dimensionally reduced space. Oftentimes, this allows the identification of genomic clusters, or individual groups with sufficient genetic differentiation. As well, STRUCTURE analysis (Pritchard, 2010; Pritchard et al., 2000), infers population structure by assigning individuals to distinct populations as well as identify admixed individuals by grouping individuals into groups satisfying the Hardy-Weinber equilibrium. Finally, under limited dispersal among geographically divided populations the population structure oftentimes can be described as isolation by distance where the populations separated by geographic distance are proportionally genetically diverged, and this is measured through a linearized Fst regression. 

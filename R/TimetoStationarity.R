@@ -1,19 +1,22 @@
-# Calculates number of time steps until stationarity is reached.
-# Inputs are:
-# Disp.matrix: Dispersal matrix
-# delta: tolerance, i.e. stop when the change in matrices is less than the tolerance parameter
-# steps: maximum number of iterations
-# This is based on x%*%x
-########################
-TimetoStationarity<-function(Disp.matrix=c(), delta=1e-6,steps=1e6){
+#' @title Matrix Stationarity
+#'
+#' @description This function calculates time to stationarity based on the x%*%x' approach
+#`
+#' @param Disp.matrix Dispersal matrix
+#' @param delta Tolerance parameter to denote stationarity
+#' @param steps maximum number of iterations
+#' @return A distance matrix.
+#' @examples
+#' Disp.matrix=matrix(data=runif(100,min=0,max=1), nrow=10)#' Fst.mat(Pop)
+#' TimetoStationarity(Disp.matrix)
+#' @export
 
+TimetoStationarity<-function(Disp.matrix=c(), delta=1e-6,steps=1e6){
   x<-Disp.matrix
   k=nrow(x)
   x<-x/rowSums(x)[row(x)]
   x[is.na(x)]<-0
   x
-  #delta = 1e-6 # tolerance to denote that we reached stationariry
-
   delta.obs = delta+1 # just something larger to start the while loop
 
   num.steps = steps # number of steps to run the markov chain

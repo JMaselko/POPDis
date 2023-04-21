@@ -1,0 +1,86 @@
+POPDis
+================
+
+# Introduction to *POPDis*
+
+Numerous marine fish species have a characteristic pelagic larval
+dispersal stage. Understanding how this life history strategy affects
+the observed population structure of the adult groups and the adaptive
+potential of the species as a whole is therefore of paramount
+importance. Inferring population structure is one of the primary goals
+of population genetics. Population structure indicates any deviation
+from the expectation of random mating resulting in population
+heterogeneity. It is now commonplace that a first step after sequencing
+genotypes is to examine the principal component (PCA) plots of sample
+genotypes for any patterns that may result from non-random mating. PCA
+partitions the total variation of the genomic sequence samples in
+orthogonal space and by plotting the first two components is able to
+visually show underlying patterns in the data in this dimensionally
+reduced space. Oftentimes, this allows the identification of genomic
+clusters, or individual groups with sufficient genetic differentiation.
+As well, STRUCTURE analysis (Pritchard, 2010; Pritchard et al., 2000),
+infers population structure by assigning individuals to distinct
+populations as well as identify admixed individuals by grouping
+individuals into groups satisfying the Hardy-Weinber equilibrium.
+Finally, under limited dispersal among geographically divided
+populations the population structure oftentimes can be described as
+isolation by distance where the populations separated by geographic
+distance are proportionally genetically diverged, and this is measured
+through a linearized Fst regression. The *POPDis* package was developed
+to test the expected population structure resulting from various
+specified dispersal models and utilizesa forward in time simulation
+incorporating demographic life history and age structure. In addition,
+the effects of cohort specific selection can be used to test for the
+effects on the observed population structure. Finally, it uses a Beta
+distribution log likelihood framework to test a suite of observed
+pairwise Fst values against candidate dispersal models.
+
+# Getting started
+
+## Installing the package
+
+*POPDis* was developed on R version 4.1.1. So first make sure you have a
+recent version of R. You can check for the version installed using the
+command:
+
+``` r
+R.version.string
+```
+
+You can install it by using the package *devtools* with the command:
+
+``` r
+library("devtools")
+install_github("jmaselko/POPDis", build_vignettes = TRUE)
+library("POPDis")
+```
+
+## Getting help
+
+### Help from within R
+
+If you have a problem with a particular function, you can get help with
+the ? operator and the function that you have a question about ie.
+
+``` r
+?lm
+```
+
+this is equivalent to the `help()` function. This only works if you know
+the functions name. The `apropos()` function searches for objects,
+including functions, that include the character string in the search.
+
+### Help from the developer
+
+*POPDis* is hosted on github. If you do not have a github account or
+have questions/suggestions, feel free to email me directly at
+<Jacek.Maselko@NOAA.gov>.
+
+# References
+
+Pritchard, J. K. (2010). Software For Inferring Population Structure.
+<http://pritch.bsd.uchicago.edu/structure_software/release_versions/v2.3.4/html/structure.html>
+
+Pritchard, J. K., Stephens, M., & Donnelly, P. (2000). Inference of
+Population Structure Using Multilocus Genotype Data.
+<http://www.stats.ox.ac.uk/pritch/home.html>.

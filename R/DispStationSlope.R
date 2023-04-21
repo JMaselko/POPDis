@@ -1,25 +1,36 @@
-########################################
-# Calculates the slope fo the mean pairwise Fst for a given dispersal model and stops when it reaches 0 under given number of significant digits (default is 6)
-# Input parameters are:
-# Dispersal="new": Use "Random" or "Panmix" to generate corresponding dispersal matrices
-# Dispersion=NA: Specify the dispersal matrix
-# N=1e3: Effective population size
-# PopLoc=10: Number of populations
-# MinAge=5: Minimum age for spawning cohort
-# MaxAge=20: Maximum lifespan
-# loci=1000: Number of loci to simulate
-# Mutation=TRUE: Wheteher to incorporate mutation
-# Selection=FALSE: Whether to incorporate selection
-# selstr=0: Selection strength
-# Stoch=TRUE: Whether to include stochasticity
-# mut=1e-6: Mutation rate
-# YStart=1: Start year for recording stationarity variables
-# YInterval=10: Interval years between recording stationarity variables
-# YFinal=1e3: Stop simulation after these many generations
-# tolerance=6: The number of significant digits to use for calculating significance of slope and when to stop when slope=0
-Disp.StationSlope<-function(Dispersal="new",Dispersion=NA, N=1e3,PopLoc=10,MinAge=5, MaxAge=20,loci=1000, Mutation=TRUE,Selection=FALSE, selstr=1,Stoch=TRUE, mut=1e-6,YStart=1,YInterval=100,YFinal=1e3, tolerance=6){
+#' @title Time to Stationarity Slope
+#'
+#' @description Function calculates the significance of the slope for the mean pairwise Fst for a given dispersal model and time frame.
+#'
+#' @param Dispersal Use the specified Dispersion matrix, or alternatively if "Random" calls Dispers.Rand function to create random dispersal matrix at each year step.
+#' @param Dispersion Specify the dispersal matrix
+#' @param N Effective population size
+#' @param PopLoc Number of populations
+#' @param MinAge Minimum age for spawning cohort
+#' @param MaxAge Maximum lifespan
+#' @param loci Number of loci to simulate
+#' @param Mutation Whether to incorporate mutation
+#' @param Selection Whether to incorporate selection
+#' @param selstr Selection strength
+#' @param Stoch Whether to include stochasticity
+#' @param mut Mutation rate
+#' @param YStart Start year for recording stationarity variables
+#' @param YInterval Interval years between testing slope
+#' @param YFinal Stop simulation after these many generations
+#' @param tolerance The number of significant digits to use for calculating significance of slope test
+
+#' @return A data frame containing two year values
+#' @returns SlopeMin year when first occurrence of significant 0 slope for mean and variance of Fst.
+#' @returns SlopeMax year when last occurrence of significant 0 slope for mean and variance of Fst.
+#'
+#' @examples
+#' Disp.StationSlope(Dispersal="Random", Dispersion=NA, N=1e3, PopLoc=10, MinAge=5, MaxAge=20, loci=1000, Mutation=TRUE, Selection=FALSE, selstr=0, Stoch=TRUE, mut=1e-6, YStart=1, YInterval=100, YFinal=1e3, tolerance=6)
+#' @export
+#' @import stats
+#' @import smatr
+
+Disp.StationSlope<-function(Dispersal="new", Dispersion=NA, N=1e3, PopLoc=10, MinAge=5, MaxAge=20, loci=1000, Mutation=TRUE, Selection=FALSE, selstr=0, Stoch=TRUE, mut=1e-6, YStart=1, YInterval=100, YFinal=1e3, tolerance=6){
   if (Dispersal=="Random"){ Dispersion=Dispers.Rand(Pops=PopLoc)}
-  if (Dispersal=="Panmix"){ Dispersion=Dispers.Panmix(Pops=PopLoc)}
 
   Disp.Stat<-data.frame(yr1=NA, meanFstSlope=NA, meanVarSlope=NA)#,
   VarMean<-data.frame(y=c(1:YInterval),meanFst=NA,varFst=NA )
@@ -45,7 +56,7 @@ for (yr in 1:YFinal){
     x<-matrix(data=NA, nrow=PopLoc, ncol=loci)
     if (Selection==TRUE) {
       s<-runif(loci,-selstr,selstr)}
-    Nc<-N
+
     for (k in 1:PopLoc){
       # Create spawning aggregates from each spawning cohort
       a_r<-0
@@ -56,11 +67,11 @@ for (yr in 1:YFinal){
           lR=lR-1 # Note this is a failure in cohort recruitment to spawning population
         } else {
           if (Stoch==TRUE){
-            a_r <- a_r+rbinom(loci,2*Nc,prob=Pop[k,r,])  # stochastic number of alleles from each cohort
-          } else { a_r <- a_r+round(2*Nc*Pop[k,r,]) }  # deterministic number of alleles from each cohort
+            a_r <- a_r+rbinom(loci,2*N,prob=Pop[k,r,])  # stochastic number of alleles from each cohort
+          } else { a_r <- a_r+round(2*N*Pop[k,r,]) }  # deterministic number of alleles from each cohort
         }
       }
-      a_r<-a_r/(2*Nc*lR) # These are the allele frequencies in cohort aggregated spawner group
+      a_r<-a_r/(2*N*lR) # These are the allele frequencies in cohort aggregated spawner group
       # Now the Spawners of each population create babies:
       if (Mutation == TRUE) {
         a_r<- a_r*(1-mut)+(1-a_r)*mut # with mutation (p(major allele not mutating)+p(minor allele mutating))
@@ -103,7 +114,7 @@ for (yr in 1:YFinal){
     VarMean[varcount,]<-c(yr,round(mean(Fstmat), tolerance),round(var(Fstmat), tolerance))
 
     if(varcount==YInterval){
-      Disp.Stat<-rbind(Disp.Stat, c(yr,slope.test(VarMean$meanFst,VarMean$y)$p,slope.test(VarMean$varFst,VarMean$y)$p))
+      Disp.Stat<-rbind(Disp.Stat, c(yr, smatr::slope.test(VarMean$meanFst, VarMean$y)$p, smatr::slope.test(VarMean$varFst, VarMean$y)$p))
       }
     varcount<-varcount+1
     if(varcount>YInterval){varcount=1} # resetting so that I only look at the last YInterval number
